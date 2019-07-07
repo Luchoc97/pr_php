@@ -1,9 +1,12 @@
 language: php
-
-before_script:
-  -composer install
-
+php:
+- 5.6
+- 7.0
+matrix:
+  include:
+  - php: 7.0
+    env: KEY=VALUE
+  allow_failures:
+  - php: 7.0
+    env: KEY=VALUE
 script: vendor/bin/phpunit --configuration phpunit.xml
-
-notifications:
-  email: luercegue31@gmail.com  
