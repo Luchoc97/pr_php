@@ -1,7 +1,7 @@
 language: php
 
 before_script:
-  -composer install --dev
+  -composer install
 
 script: vendor/bin/phpunit --configuration phpunit.xml
 
