@@ -1,10 +1,10 @@
-language: php
-php:
-  -7.3.5
-before_script:
-  -composer install --dev
-
-script: vendor/bin/phpunit --configuration phpunit.xml
-
-notifications:
-  email: luercegue31@gmail.com  
+language:php
+php
+ -"7.3.5"
+ #command to install dependencies
+ install:
+  -.bin/ci/install_dependencies.sh
+  -php vendor/vendors.php
+ #command to run tests
+ script:
+  -phpunit --configuration $DB.phpunit.xml
