@@ -1,5 +1,158 @@
 language: php
+# Seleccion de las versiones de lenguaje a probar: 5.2.17, 5.3.x, 5.4.x, Hack de face (hhvm-3.3, hhvm-3.6, hhvm-3.9, hhvm-3.12, hhvm-3.15, hhvm-3.18, hhvm-nightly) etc
+# TravisCI no soporta versiones 5.2.x and 5.3.x en Trusty. Se especifica distribucion Precise para esas versiones.
+matrix:
+  include:
+  # Definicion de pruebas sobre multiples versiones de lenguaje y motor
+    - php: 5.3
+      dist: precise
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
+      - postgresql
 
-before_script: ./before_script.sh
+    - php: 5.4
+      dist: trusty
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
 
-script: "php run-phpunit.php"
+    - php: 5.4
+      dist: trusty
+      env:
+      - DB=MySQL
+      - VER=5.7
+      sudo: required
+      services:
+      - mysql
+      addons:
+        apt:
+          sources:
+          - mysql-5.7-trusty
+          packages:
+          - mysql-server
+
+    - php: 5.5
+      dist: trusty
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
+      
+    - php: 5.6
+      dist: trusty
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
+      
+    - php: 7.0
+      dist: trusty
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
+      
+    - php: 7.1
+      dist: trusty
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
+
+    - php: 7.2
+      dist: trusty
+      env:
+      - DB1=MySQL
+      - DB2=PostgreSQL
+      - DB3=SQLite3
+      sudo: required
+      services:
+      - mysql
+      - postgresql
+
+#    - php: hhvm
+#      dist: trusty
+#      env:
+#      - DB1=MySQL
+#      - DB2=PostgreSQL
+#      - DB3=SQLite3
+#      sudo: required
+#      services:
+#      - mysql
+#      - postgresql
+
+# Configura notificaciones (email, IRC, campfire etc)
+notifications:
+#  irc: "irc.freenode.org#yourfavouriteroomfortravis"
+  email: "unix4you2@gmail.com"
+
+# Ramas del repositorio a tener en cuenta
+branches:
+  only:
+    - master
+    # Mediante expresiones regulares
+    #    - /^deploy-.*$/
+
+#before_install:
+# Comandos para preparar el sistema antes de las pruebas para instalar prerequisitos o dependencias
+#ls -al
+
+# Comandos para instalar prerequisitos o dependencias
+install:
+  #- pear install pear/PHP_CodeSniffer
+  - phpenv rehash
+  #Verificamos la instalacion y el soporte de estandares
+  #- phpcs -i
+  #Otra forma: php pyrus.phar install pear/PHP_CodeSniffer-2.0.0RC4
+  #Otra forma: pear install PHP_CodeSniffer-2.0.0RC4
+  #Otra forma: pyrus install pear/PHP_CodeSniffer
+
+
+# Ejecuta scripts antes de correr las pruebas, puede utilizar variables de entorno (env:)
+before_script:
+  #Creamos la base de datos para la instalacion de prueba sobre cada motor
+  - mysql -e 'create database practico;'
+  - psql -c 'create database practico;' -U postgres
+  #SQLite3:
+  - touch practico.db
+
+  #Asegura permisos completos en la carpeta de pruebas
+  - chmod -R 777 dev_tools/tests
+
+  #  - if [[ "$DB" == "pgsql" ]]; then psql -c "DROP DATABASE IF EXISTS hello_world_test;" -U postgres; fi
+  #  - if [[ "$DB" == "pgsql" ]]; then psql -c "create database hello_world_test;" -U postgres; fi
+  #  - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS hello_world_test;" -uroot; fi
+
+# Comandos para construir.  Todos deben retornar cero, cualquier otra salida se considera una falla
+script:
+  - sh  dev_tools/tests/t_sintaxis.sh
+  - php dev_tools/tests/t_obsoletas.php
+  - php dev_tools/tests/t_archivos.php
+  - php dev_tools/tests/t_basedatos.php
