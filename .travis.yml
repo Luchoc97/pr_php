@@ -1,53 +1,10 @@
 language: php
 
-cache:
-  directories:
-    - cache
+before_script:
+  - composer install --dev
+  
+script : vendor/bin/phpunit --configuration phpunit.xml
 
-# sudo: required
-# services:
-# - docker
-# - rabbitmq
-# - memcached
-# - redis-server
-# - mysql
-# - mariadb
-# - postgresql
-# - mongodb
-php:
-  # - 5.6
-  # - 7.0
-  # - 7.1
-  - 7.2
-
-before_install:
-  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-
-install:
-  - composer install -q
-  # - composer update -q
-  - curl -fsSL http://get.sensiolabs.org/sami.phar -o sami
-  - chmod +x sami
-
-script:
-  - vendor/bin/phpunit --coverage-clover=coverage.xml
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  - ./sami update .sami.php
-
-env:
-  global:
-    - MONGODB=disable
-    # - DB=sqlite
-    # - DB=mysql
-    # - DB=postgresql
-
-deploy:
-  provider: pages
-  skip-cleanup: true
-  local-dir: build
-  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep-history: true
-  on:
-    branch: master
+notifications:
+  email:
+    -example.mail@example.com
